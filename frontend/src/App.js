@@ -17,7 +17,6 @@ function App() {
     scrollToBottom();
   }, [messages]);
 
-  // Add welcome message on component mount
   useEffect(() => {
     setMessages([
       {

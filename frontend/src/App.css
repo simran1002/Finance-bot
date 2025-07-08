@@ -339,7 +339,6 @@
   transform: translateX(2px);
 }
 
-/* Enhanced typing indicator */
 .typing-indicator {
   display: flex;
   gap: 6px;
@@ -375,7 +374,6 @@
   }
 }
 
-/* Quick action buttons */
 .quick-actions {
   display: flex;
   gap: 8px;
@@ -423,7 +421,6 @@
   height: 14px;
 }
 
-/* Responsive design */
 @media (max-width: 768px) {
   .App {
     padding: 10px;

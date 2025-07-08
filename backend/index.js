@@ -4,7 +4,6 @@ const bodyParser = require('body-parser');
 const connectDB = require('./config/database');
 const seedData = require('./utils/seedData');
 
-// Import models
 const Stock = require('./models/Stock');
 const Crypto = require('./models/Crypto');
 const Forex = require('./models/Forex');
@@ -12,25 +11,18 @@ const Forex = require('./models/Forex');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Connect to MongoDB
 connectDB();
 
-// Middleware
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Seed data on startup
 seedData();
-
-// Chatbot response logic
 async function generateResponse(userMessage) {
   const message = userMessage.toLowerCase();
   
   try {
-    // Stock-related queries
     if (message.includes('stock') || message.includes('stocks')) {
-      // Technology stocks
       if (message.includes('apple') || message.includes('aapl')) {
         const stock = await Stock.findOne({ symbol: 'AAPL' });
         if (stock) {
@@ -79,8 +71,6 @@ async function generateResponse(userMessage) {
           return `Netflix Inc. (NFLX) is currently trading at $${stock.price} with a ${stock.change > 0 ? '+' : ''}${stock.change}% change today. Volume: ${stock.volume.toLocaleString()}`;
         }
       }
-      
-      // Financial stocks
       if (message.includes('jpmorgan') || message.includes('jp morgan') || message.includes('jpm')) {
         const stock = await Stock.findOne({ symbol: 'JPM' });
         if (stock) {
@@ -99,8 +89,6 @@ async function generateResponse(userMessage) {
           return `Goldman Sachs Group Inc. (GS) is currently trading at $${stock.price} with a ${stock.change > 0 ? '+' : ''}${stock.change}% change today. Volume: ${stock.volume.toLocaleString()}`;
         }
       }
-      
-      // Healthcare stocks
       if (message.includes('johnson') || message.includes('jnj')) {
         const stock = await Stock.findOne({ symbol: 'JNJ' });
         if (stock) {
@@ -119,8 +107,6 @@ async function generateResponse(userMessage) {
           return `UnitedHealth Group Inc. (UNH) is currently trading at $${stock.price} with a ${stock.change > 0 ? '+' : ''}${stock.change}% change today. Volume: ${stock.volume.toLocaleString()}`;
         }
       }
-      
-      // Consumer stocks
       if (message.includes('coca') || message.includes('coke') || message.includes('ko')) {
         const stock = await Stock.findOne({ symbol: 'KO' });
         if (stock) {
@@ -145,8 +131,6 @@ async function generateResponse(userMessage) {
           return `The Walt Disney Company (DIS) is currently trading at $${stock.price} with a ${stock.change > 0 ? '+' : ''}${stock.change}% change today. Volume: ${stock.volume.toLocaleString()}`;
         }
       }
-      
-      // Industrial stocks
       if (message.includes('boeing') || message.includes('ba')) {
         const stock = await Stock.findOne({ symbol: 'BA' });
         if (stock) {
@@ -159,14 +143,10 @@ async function generateResponse(userMessage) {
           return `Caterpillar Inc. (CAT) is currently trading at $${stock.price} with a ${stock.change > 0 ? '+' : ''}${stock.change}% change today. Volume: ${stock.volume.toLocaleString()}`;
         }
       }
-      
-      // General stocks query
       const stocks = await Stock.find().limit(10);
       const stockList = stocks.map(s => `${s.symbol} (${s.name})`).join(', ');
       return `Here are some popular stocks: ${stockList}. Ask me about any specific stock by name or symbol!`;
     }
-    
-    // Crypto-related queries
     if (message.includes('crypto') || message.includes('bitcoin') || message.includes('ethereum') || message.includes('cryptocurrency')) {
       if (message.includes('bitcoin') || message.includes('btc')) {
         const crypto = await Crypto.findOne({ symbol: 'BTC' });
@@ -228,14 +208,10 @@ async function generateResponse(userMessage) {
           return `Polygon (MATIC) is currently trading at $${crypto.price} with a ${crypto.change > 0 ? '+' : ''}${crypto.change}% change today. Volume: $${(crypto.volume / 1000000000).toFixed(1)}B`;
         }
       }
-      
-      // General crypto query
       const cryptos = await Crypto.find().limit(8);
       const cryptoList = cryptos.map(c => `${c.symbol} (${c.name})`).join(', ');
       return `Here are some popular cryptocurrencies: ${cryptoList}. Ask me about any specific crypto by name or symbol!`;
     }
-    
-    // Forex-related queries
     if (message.includes('forex') || message.includes('currency') || message.includes('exchange rate') || message.includes('foreign exchange')) {
       if (message.includes('eur') || message.includes('euro')) {
         const forex = await Forex.findOne({ pair: 'EUR/USD' });
@@ -286,13 +262,11 @@ async function generateResponse(userMessage) {
         }
       }
       
-      // General forex query
+
       const forexPairs = await Forex.find().limit(8);
       const forexList = forexPairs.map(f => f.pair).join(', ');
       return `Here are some popular forex pairs: ${forexList}. Ask me about any specific currency pair!`;
     }
-    
-    // Market sector queries
     if (message.includes('technology') || message.includes('tech stocks')) {
       const techStocks = await Stock.find({ 
         symbol: { $in: ['AAPL', 'GOOGL', 'MSFT', 'AMZN', 'TSLA', 'NVDA', 'META', 'NFLX', 'ADBE', 'CRM'] }
@@ -316,8 +290,6 @@ async function generateResponse(userMessage) {
       const healthList = healthStocks.map(s => `${s.symbol} ($${s.price})`).join(', ');
       return `Major healthcare stocks: ${healthList}. Ask me about any specific healthcare company!`;
     }
-    
-    // General finance queries
     if (message.includes('market') || message.includes('finance') || message.includes('data') || message.includes('investing')) {
       return `I can help you with comprehensive finance data! I have information about:
 • 30+ major stocks across technology, finance, healthcare, consumer, and industrial sectors
@@ -326,8 +298,6 @@ async function generateResponse(userMessage) {
 
 Try asking about specific assets like "Apple stock", "Bitcoin price", "EUR/USD rate", or ask about sectors like "technology stocks" or "healthcare stocks".`;
     }
-    
-    // Default response
     return `Hello! I'm your comprehensive finance chatbot. I can help you with detailed information about:
 • 30+ major stocks (AAPL, GOOGL, MSFT, JPM, JNJ, etc.)
 • 20+ cryptocurrencies (BTC, ETH, SOL, DOGE, etc.)  
@@ -340,13 +310,9 @@ Try asking me about specific assets like "Apple stock", "Bitcoin price", or "EUR
     return "Sorry, I'm having trouble accessing the finance data right now. Please try again later.";
   }
 }
-
-// API Routes
 app.get('/', (req, res) => {
   res.json({ message: 'Finance Chatbot API is running!' });
 });
-
-// Chat endpoint
 app.post('/api/chat', async (req, res) => {
   try {
     const { message } = req.body;
@@ -367,8 +333,6 @@ app.post('/api/chat', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
-
-// Get all finance data
 app.get('/api/finance-data', async (req, res) => {
   try {
     const [stocks, crypto, forex] = await Promise.all([
@@ -387,8 +351,6 @@ app.get('/api/finance-data', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
-
-// Get specific data types
 app.get('/api/stocks', async (req, res) => {
   try {
     const stocks = await Stock.find();
@@ -430,8 +392,6 @@ app.get('/api/forex', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
-
-// Add new stock
 app.post('/api/stocks', async (req, res) => {
   try {
     const { symbol, name, price, change, volume } = req.body;
@@ -457,8 +417,6 @@ app.post('/api/stocks', async (req, res) => {
     }
   }
 });
-
-// Update stock price
 app.put('/api/stocks/:symbol', async (req, res) => {
   try {
     const { symbol } = req.params;
@@ -484,8 +442,6 @@ app.put('/api/stocks/:symbol', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
-
-// Start server
 app.listen(PORT, () => {
   console.log(`🚀 Finance Chatbot API server running on port ${PORT}`);
   console.log(`📊 API available at: http://localhost:${PORT}`);
